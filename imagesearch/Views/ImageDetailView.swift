@@ -14,9 +14,35 @@ struct ImageDetailView: View {
     
     @Environment(\.modelContext) private var modelContext
     @Query private var items: [SavedImage]
+
+    @GestureState private var magnifyBy = 1.0
     
     let cache: URLCache = .imageCache
-    let image: SearchImage
+    @State var image: SearchImage
+    let images: [SearchImage]
+    
+    @State private var isDragging = false
+    @State private var translation = CGSize.zero
+
+    var drag: some Gesture {
+        DragGesture()
+            .onChanged { _ in self.isDragging = true }
+            .onEnded { value in
+                if value.translation.width < 0 {
+                    loadNextImage()
+                } else {
+                    loadPreviousImage()
+                }
+                self.isDragging = false
+            }
+    }
+
+    var magnification: some Gesture {
+        MagnifyGesture()
+            .updating($magnifyBy) { value, gestureState, transaction in
+                gestureState = value.magnification
+            }
+    }
     
     var body: some View {
         VStack {
@@ -38,6 +64,10 @@ struct ImageDetailView: View {
                             saveImage()
                         }
                     }
+                    .scaleEffect(magnifyBy)
+                    .gesture(magnification)
+                    .gesture(drag)
+                    
             } placeholder: {
                 Image(systemName: "photo")
             }
@@ -105,5 +135,19 @@ struct ImageDetailView: View {
             return nil
         }
         return data
+    }
+    
+    private func loadNextImage() {
+        Logger.userInteraction.info("User swiped for next image")
+        if let index = self.images.firstIndex(of: self.image) {
+            self.image = images[index+1]
+        }
+    }
+    
+    private func loadPreviousImage() {
+        Logger.userInteraction.info("User swiped for prev image")
+        if let index = self.images.firstIndex(of: self.image) {
+            self.image = images[index-1]
+        }
     }
 }

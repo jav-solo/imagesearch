@@ -18,7 +18,7 @@ struct ImagePost: Decodable, Identifiable {
     var images: [SearchImage]?
 }
 
-struct SearchImage: Decodable, Identifiable {
+struct SearchImage: Decodable, Identifiable, Equatable {
     var id: String
     var title: String?
     var description: String?
