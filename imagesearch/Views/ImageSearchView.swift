@@ -76,7 +76,7 @@ struct ImageSearchView: View {
         List {
             ForEach(images) { image in
                 NavigationLink {
-                    ImageDetailView(image: image)
+                    ImageDetailView(image: image, images: images)
                 } label: {
                     ImagePreviewView(image: image)
                 }
