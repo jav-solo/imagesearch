@@ -62,3 +62,7 @@ struct SearchSuggestionView: View {
         }
     }
 }
+
+#Preview {
+    SearchSuggestionView(query: Binding<String>.constant(""), presentSearch: Binding<Bool>.constant(false))
+}
